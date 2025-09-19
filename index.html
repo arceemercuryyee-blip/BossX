@@ -702,7 +702,7 @@
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-2">
                         <div class="crypto-icon">
-                            <img src="https://i.ibb.co/qYBkPDH3/Picsart-25-04-01-16-25-47-054.png" alt="BossX Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=\'background: linear-gradient(145deg, #f59e0b, #d97706); color: white; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem;\'>BX</div>'" />
+                            <img src="https://i.ibb.co/qYBkPDH3/Picsart-25-04-01-16-25-47-054.png" alt="BossX Logo" onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=\\'background: linear-gradient(145deg, #f59e0b, #d97706); color: white; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem;\\'>BX</div>'" />
                         </div>
                         <div id="logo-text">
                             <h1 class="text-lg font-bold text-amber-400">BossX</h1>
@@ -807,7 +807,7 @@
                         <!-- User Profile -->
                         <div class="flex items-center space-x-2 px-2 py-1 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-amber-500/50 transition-colors cursor-pointer">
                             <div class="profile-picture">
-                                <img src="https://i.ibb.co/gbVsGLy0/FB-IMG-1617237754232.jpg" alt="Fery Muliawan" onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=\'background: linear-gradient(145deg, #3b82f6, #2563eb); color: white; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; border-radius: 50%;\'>FM</div>'" />
+                                <img src="https://i.ibb.co/gbVsGLy0/FB-IMG-1617237754232.jpg" alt="Fery Muliawan" onerror="this.style.display='none'; this.parentNode.innerHTML='<div style=\\'background: linear-gradient(145deg, #3b82f6, #2563eb); color: white; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.75rem; border-radius: 50%;\\'>FM</div>'" />
                             </div>
                             <div class="text-sm">
                                 <p class="text-white font-medium">Fery Muliawan</p>
@@ -961,7 +961,7 @@
                                     <i data-lucide="dollar-sign" class="w-4 h-4 text-green-400"></i>
                                 </div>
                                 <div class="text-2xl font-bold text-white">
-                                    <span id="usdt-balance">0,00 USDT</span>
+                                    <span id="usdt-balance">50,00 USDT</span>
                                 </div>
                                 <p class="text-xs text-green-400 mt-1">Available balance</p>
                             </div>
@@ -1242,7 +1242,7 @@
 
                                         <div class="text-center mb-6">
                                             <div class="text-3xl font-bold text-green-400 mb-2">
-                                                <span id="withdrawal-balance">0.00 USDT</span>
+                                                <span id="withdrawal-balance">50.00 USDT</span>
                                             </div>
                                             <p class="text-sm text-gray-400">Saldo tersedia</p>
                                         </div>
@@ -1479,7 +1479,1124 @@
         </div>
     </div>
 
-    <!-- JavaScript akan dilanjutkan di file terpisah -->
-    <script src="/app/js/app.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Global variables
+        let currentPage = 'dashboard';
+        let activeTab = 'USDT';
+        let activeWithdrawalTab = 'USDT';
+
+        // Dashboard variables
+        let isNodeActive = false;
+        let isValidationRunning = false;
+        let countdownInterval;
+        let autoClaimInterval = null;
+        let autoClaimSeconds = 60;
+        let validationInterval;
+        let currentValidationReward = 0;
+        let totalRewardBalance = 0;
+        let usdtBalance = 50; // Demo balance untuk withdrawal
+        let bossxBalance = 100; // Starting balance for demo
+        let validationCounter = 1;
+
+        // Deposit variables
+        const walletAddresses = {
+            USDT: {
+                address: 'TQ3HBNdVFmTFvz9wz3AR2Siss7MRN1fuRM',
+                qrCode: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TQ3HBNdVFmTFvz9wz3AR2Siss7MRN1fuRM'
+            },
+            BOSSX: {
+                address: 'TTfKjrU18mi223ukVmz6FMNgBkma13kVA3',
+                qrCode: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TTfKjrU18mi223ukVmz6FMNgBkma13kVA3'
+            }
+        };
+
+        // Withdrawal configuration
+        const withdrawalConfig = {
+            USDT: {
+                networks: {
+                    TRC20: { fee: 1, min: 10 },
+                    BEP20: { fee: 1, min: 10 }
+                }
+            },
+            BOSSX: {
+                networks: {
+                    TRC20: { fee: 0.1, min: 1 }
+                }
+            }
+        };
+
+        // Sample deposit history data
+        const depositHistory = {
+            USDT: [
+                {
+                    id: '1',
+                    amount: 100.50,
+                    txHash: 'a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef1234',
+                    fromAddress: 'TXyza123456789012345678901234567890',
+                    status: 'confirmed',
+                    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+                    confirmationCount: 1
+                },
+                {
+                    id: '2',
+                    amount: 250.75,
+                    txHash: 'b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef1234a1',
+                    fromAddress: 'TYzab234567890123456789012345678901',
+                    status: 'confirmed',
+                    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+                    confirmationCount: 1
+                },
+                {
+                    id: '3',
+                    amount: 50.00,
+                    txHash: 'c3d4e5f6789012345678901234567890abcdef1234567890abcdef1234a1b2',
+                    fromAddress: 'TZabc345678901234567890123456789012',
+                    status: 'pending',
+                    timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
+                    confirmationCount: 0
+                }
+            ],
+            BOSSX: [
+                {
+                    id: '4',
+                    amount: 1000.0,
+                    txHash: 'd4e5f6789012345678901234567890abcdef1234567890abcdef1234a1b2c3',
+                    fromAddress: 'TAbcd456789012345678901234567890123',
+                    status: 'confirmed',
+                    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
+                    confirmationCount: 1
+                },
+                {
+                    id: '5',
+                    amount: 500.0,
+                    txHash: 'e5f6789012345678901234567890abcdef1234567890abcdef1234a1b2c3d4',
+                    fromAddress: 'TBcde567890123456789012345678901234',
+                    status: 'confirmed',
+                    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+                    confirmationCount: 1
+                },
+                {
+                    id: '6',
+                    amount: 2000.0,
+                    txHash: 'f6789012345678901234567890abcdef1234567890abcdef1234a1b2c3d4e5',
+                    fromAddress: 'TCdef678901234567890123456789012345',
+                    status: 'pending',
+                    timestamp: new Date(Date.now() - 15 * 60 * 1000), // 15 minutes ago
+                    confirmationCount: 0
+                }
+            ]
+        };
+
+        // Sample withdrawal history data
+        const withdrawalHistory = {
+            USDT: [],
+            BOSSX: []
+        };
+
+        // Real-time clock
+        function updateClock() {
+            const now = new Date();
+            const timeOptions = { 
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            const dateOptions = { 
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            
+            document.getElementById('time').textContent = now.toLocaleTimeString('id-ID', timeOptions);
+            document.getElementById('date').textContent = now.toLocaleDateString('id-ID', dateOptions);
+        }
+
+        // Show success message
+        function showSuccessMessage(message) {
+            // Remove existing message if any
+            const existingMessage = document.querySelector('.success-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            // Create new message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'success-message';
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+
+        // Show error message
+        function showErrorMessage(message) {
+            // Remove existing message if any
+            const existingMessage = document.querySelector('.error-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            // Create new message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'error-message';
+            messageDiv.textContent = message;
+            document.body.appendChild(messageDiv);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+
+        // Page navigation
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Show selected page
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Update menu active state
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+                item.classList.add('text-gray-400');
+            });
+
+            const activeMenuItem = document.querySelector(`[data-page="${pageId}"]`);
+            if (activeMenuItem) {
+                activeMenuItem.classList.add('active');
+                activeMenuItem.classList.remove('text-gray-400');
+            }
+
+            currentPage = pageId;
+
+            // Initialize page if needed
+            if (pageId === 'deposit') {
+                updateDepositContent();
+            } else if (pageId === 'withdrawal') {
+                updateWithdrawalContent();
+            }
+        }
+
+        // Dashboard Functions
+        function activateNode() {
+            const inputValue = document.getElementById('activation-input').value;
+            const inputAmount = parseFloat(inputValue) || 0;
+            
+            if (inputAmount < 10) {
+                showErrorMessage('Minimal 10 BossX diperlukan untuk aktivasi node!');
+                return;
+            }
+            
+            if (bossxBalance < inputAmount) {
+                showErrorMessage('Saldo BossX tidak mencukupi!');
+                return;
+            }
+            
+            // Deduct BossX balance
+            bossxBalance -= inputAmount;
+            isNodeActive = true;
+            
+            // Update UI
+            const activationButton = document.getElementById('activation-button');
+            const activationInput = document.getElementById('activation-input');
+            
+            activationButton.innerHTML = 'Node Aktif ✓';
+            activationButton.style.background = 'linear-gradient(145deg, #10b981, #059669)';
+            activationButton.disabled = true;
+            activationInput.disabled = true;
+            
+            document.getElementById('node-status').textContent = 'Aktif';
+            document.getElementById('node-status').style.color = '#10b981';
+            
+            // Update balance display
+            updateBalanceDisplays();
+            
+            showSuccessMessage(`Node berhasil diaktivasi dengan ${inputAmount} BossX!`);
+        }
+
+        function startValidationRunning() {
+            if (!isNodeActive) {
+                showErrorMessage('Aktivasi node terlebih dahulu!');
+                return;
+            }
+            
+            validationInterval = setInterval(() => {
+                currentValidationReward = validationCounter * 0.000000001;
+                document.getElementById('validation-balance').textContent = currentValidationReward.toFixed(9) + ' BossX';
+                validationCounter++;
+            }, 1000);
+        }
+
+        function stopValidationRunning() {
+            if (validationInterval) {
+                clearInterval(validationInterval);
+                validationInterval = null;
+                currentValidationReward = 0;
+                validationCounter = 1;
+                document.getElementById('validation-balance').textContent = '0,000000000 BossX';
+            }
+        }
+
+        function performAutoClaim() {
+            if (currentValidationReward > 0 && isValidationRunning) {
+                totalRewardBalance += currentValidationReward;
+                
+                // Show claim message
+                showSuccessMessage(`Auto Claim: +${currentValidationReward.toFixed(9)} BossX`);
+                
+                // Reset validation balance
+                currentValidationReward = 0;
+                validationCounter = 1;
+                
+                // Update displays
+                updateBalanceDisplays();
+            }
+        }
+
+        function convertToUSDT() {
+            if (totalRewardBalance < 1) {
+                showErrorMessage('Minimal 1 BossX diperlukan untuk konversi ke USDT!');
+                return;
+            }
+            
+            // Simple conversion rate: 1 BossX = 1 USDT
+            const convertAmount = Math.floor(totalRewardBalance);
+            usdtBalance += convertAmount;
+            totalRewardBalance -= convertAmount;
+            
+            updateBalanceDisplays();
+            showSuccessMessage(`Berhasil convert ${convertAmount} BossX ke ${convertAmount} USDT!`);
+        }
+
+        function updateBalanceDisplays() {
+            document.getElementById('bossx-balance').textContent = bossxBalance.toFixed(9) + ' BossX';
+            document.getElementById('validation-balance').textContent = currentValidationReward.toFixed(9) + ' BossX';
+            document.getElementById('reward-balance').textContent = totalRewardBalance.toFixed(9) + ' BossX';
+            document.getElementById('usdt-balance').textContent = usdtBalance.toFixed(2) + ' USDT';
+        }
+
+        function startAutoClaimCountdown() {
+            if (autoClaimInterval) {
+                clearInterval(autoClaimInterval);
+            }
+            
+            autoClaimSeconds = 60; // Reset to 60
+            
+            function updateAutoClaimTimer() {
+                if (!isValidationRunning) {
+                    document.getElementById('auto-claim-timer').textContent = '--';
+                    return;
+                }
+                
+                if (autoClaimSeconds <= 0) {
+                    // Perform auto claim
+                    performAutoClaim();
+                    autoClaimSeconds = 60; // Reset to 60 seconds
+                }
+                
+                document.getElementById('auto-claim-timer').textContent = autoClaimSeconds;
+                autoClaimSeconds--;
+            }
+            
+            autoClaimInterval = setInterval(updateAutoClaimTimer, 1000);
+        }
+
+        function stopAutoClaimCountdown() {
+            if (autoClaimInterval) {
+                clearInterval(autoClaimInterval);
+                autoClaimInterval = null;
+            }
+            document.getElementById('auto-claim-timer').textContent = '--';
+        }
+
+        function togglePower() {
+            if (!isNodeActive) {
+                showErrorMessage('Aktivasi node terlebih dahulu!');
+                return;
+            }
+            
+            // Fix: Prevent manual OFF when running (only allow auto OFF at 6 AM)
+            if (isValidationRunning) {
+                showSuccessMessage('Masternode sedang running! Hanya akan berhenti otomatis pada jam 06:00.');
+                return;
+            }
+            
+            const powerBtn = document.getElementById('power-btn');
+            const powerIcon = document.getElementById('power-icon');
+            const statusText = document.getElementById('validation-status');
+            const countdownDisplay = document.getElementById('countdown-display');
+            const powerStatus = document.getElementById('power-status');
+            
+            isValidationRunning = !isValidationRunning;
+            
+            if (isValidationRunning) {
+                // Turn ON
+                powerBtn.classList.remove('off');
+                powerBtn.classList.add('on');
+                statusText.textContent = 'Stop validasi setiap jam 06.00';
+                countdownDisplay.style.display = 'block';
+                powerStatus.style.display = 'block';
+                powerStatus.style.color = '#10b981';
+                startCountdown();
+                startValidationRunning();
+                startAutoClaimCountdown(); // Start auto claim countdown when power ON
+                showSuccessMessage('Validasi dimulai! Earning BossX per detik...');
+            }
+            
+            // Re-initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        function forceStopValidation() {
+            if (!isValidationRunning) return;
+            
+            const powerBtn = document.getElementById('power-btn');
+            const statusText = document.getElementById('validation-status');
+            const countdownDisplay = document.getElementById('countdown-display');
+            const powerStatus = document.getElementById('power-status');
+            
+            isValidationRunning = false;
+            
+            // Turn OFF
+            powerBtn.classList.remove('on');
+            powerBtn.classList.add('off');
+            statusText.textContent = 'Belum berjalan';
+            countdownDisplay.style.display = 'none';
+            powerStatus.style.display = 'none';
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            stopValidationRunning();
+            stopAutoClaimCountdown();
+            
+            // Re-initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        function startCountdown() {
+            function updateCountdown() {
+                const now = new Date();
+                const target = new Date();
+                target.setHours(6, 0, 0, 0);
+                
+                // If 6 AM has passed today, set target for tomorrow
+                if (now >= target) {
+                    target.setDate(target.getDate() + 1);
+                }
+                
+                const diff = target.getTime() - now.getTime();
+                
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                document.getElementById('countdown-time').textContent = timeString;
+            }
+            
+            updateCountdown();
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        function checkSixAMStop() {
+            const now = new Date();
+            if (now.getHours() === 6 && now.getMinutes() === 0 && now.getSeconds() === 0) {
+                if (isValidationRunning) {
+                    // Auto stop at 6 AM using force stop function
+                    forceStopValidation();
+                    showSuccessMessage('Validasi dihentikan otomatis pada jam 06:00. Silakan aktifkan kembali untuk melanjutkan.');
+                }
+            }
+        }
+
+        // Deposit Functions
+        function updateDepositContent() {
+            const wallet = walletAddresses[activeTab];
+            
+            // Update QR code and labels
+            document.getElementById('qr-currency').textContent = activeTab;
+            document.getElementById('wallet-currency').textContent = activeTab;
+            document.getElementById('history-currency').textContent = activeTab;
+            document.getElementById('qr-code-image').src = wallet.qrCode;
+            document.getElementById('wallet-address').textContent = wallet.address;
+            document.getElementById('warning-currency').textContent = `• Hanya kirim ${activeTab} ke alamat ini`;
+            document.getElementById('min-deposit').textContent = `• Minimal deposit: ${activeTab === 'USDT' ? '10 USDT' : '1 BOSSX'}`;
+            document.getElementById('amount-currency').textContent = activeTab;
+
+            // Update tab appearance
+            const usdtTab = document.getElementById('usdt-tab');
+            const bossxTab = document.getElementById('bossx-tab');
+
+            if (activeTab === 'USDT') {
+                usdtTab.className = 'tab-button active relative px-8 py-3 rounded-xl font-semibold transition-all duration-300 bg-gradient-to-r from-amber-500 to-orange-500 text-black';
+                bossxTab.className = 'tab-button relative px-8 py-3 rounded-xl font-semibold transition-all duration-300 bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white';
+            } else {
+                bossxTab.className = 'tab-button active relative px-8 py-3 rounded-xl font-semibold transition-all duration-300 bg-gradient-to-r from-amber-500 to-orange-500 text-black';
+                usdtTab.className = 'tab-button relative px-8 py-3 rounded-xl font-semibold transition-all duration-300 bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white';
+            }
+
+            // Update history
+            updateDepositHistory();
+            updateDepositStatistics();
+        }
+
+        function updateDepositHistory() {
+            const history = depositHistory[activeTab] || [];
+            const historyContent = document.getElementById('history-content');
+
+            if (history.length === 0) {
+                historyContent.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="calendar" class="text-gray-400 w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-gray-400 text-lg font-semibold mb-2">Belum ada history deposit</h4>
+                        <p class="text-gray-500">History deposit ${activeTab} Anda akan muncul di sini</p>
+                    </div>
+                `;
+            } else {
+                let tableHTML = `
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-700">
+                                    <th class="text-left p-3 text-gray-400 font-semibold">Tanggal</th>
+                                    <th class="text-left p-3 text-gray-400 font-semibold">Jumlah</th>
+                                    <th class="text-left p-3 text-gray-400 font-semibold">TX Hash</th>
+                                    <th class="text-left p-3 text-gray-400 font-semibold">Status</th>
+                                    <th class="text-left p-3 text-gray-400 font-semibold">Konfirmasi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                history.forEach(deposit => {
+                    const statusIcon = getStatusIcon(deposit.status);
+                    const statusColor = getStatusColor(deposit.status);
+                    const statusText = getStatusText(deposit.status);
+                    
+                    tableHTML += `
+                        <tr class="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
+                            <td class="p-3">
+                                <div class="flex items-center text-white">
+                                    <i data-lucide="clock" class="mr-2 text-gray-400 w-4 h-4"></i>
+                                    ${formatDate(deposit.timestamp)}
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="font-semibold text-amber-400">
+                                    ${formatAmount(deposit.amount)} ${activeTab}
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="font-mono text-sm text-gray-300 max-w-32 truncate">
+                                    ${deposit.txHash}
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="flex items-center ${statusColor}">
+                                    ${statusIcon}
+                                    <span class="ml-2 capitalize font-semibold">
+                                        ${statusText}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="text-gray-300">
+                                    ${deposit.confirmationCount}/1
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tableHTML += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                historyContent.innerHTML = tableHTML;
+            }
+
+            // Re-initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        function updateDepositStatistics() {
+            const history = depositHistory[activeTab] || [];
+            const confirmedDeposits = history.filter(d => d.status === 'confirmed');
+            const pendingDeposits = history.filter(d => d.status === 'pending');
+            const totalAmount = confirmedDeposits.reduce((sum, d) => sum + d.amount, 0);
+
+            document.getElementById('total-deposits').textContent = confirmedDeposits.length;
+            document.getElementById('total-amount').textContent = formatAmount(totalAmount);
+            document.getElementById('pending-deposits').textContent = pendingDeposits.length;
+        }
+
+        // Withdrawal Functions
+        function updateWithdrawalContent() {
+            // Update balance display
+            const balance = activeWithdrawalTab === 'USDT' ? usdtBalance : bossxBalance;
+            document.getElementById('withdrawal-balance').textContent = `${formatAmount(balance)} ${activeWithdrawalTab}`;
+            
+            // Update currency labels
+            document.getElementById('withdrawal-currency').textContent = activeWithdrawalTab;
+            document.getElementById('withdrawal-history-currency').textContent = activeWithdrawalTab;
+            document.getElementById('withdrawal-amount-currency').textContent = activeWithdrawalTab;
+
+            // Update network options
+            const networkSelection = document.getElementById('network-selection');
+            if (activeWithdrawalTab === 'USDT') {
+                networkSelection.style.display = 'block';
+                networkSelection.innerHTML = `
+                    <label class="text-sm text-gray-400">Pilih Network:</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="network-option selected">
+                            <input type="radio" name="withdrawal-network" value="TRC20" checked>
+                            <div class="flex items-center justify-between">
+                                <span class="font-semibold text-white">TRC20</span>
+                                <span class="text-xs text-gray-400">TRON</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">Fee: 1 USDT</div>
+                        </label>
+                        <label class="network-option">
+                            <input type="radio" name="withdrawal-network" value="BEP20">
+                            <div class="flex items-center justify-between">
+                                <span class="font-semibold text-white">BEP20</span>
+                                <span class="text-xs text-gray-400">BSC</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">Fee: 1 USDT</div>
+                        </label>
+                    </div>
+                `;
+                document.getElementById('withdrawal-min').textContent = '• Minimal withdrawal: 10 USDT';
+                document.getElementById('withdrawal-fee').textContent = '• Fee withdrawal: 1 USDT';
+            } else {
+                networkSelection.style.display = 'block';
+                networkSelection.innerHTML = `
+                    <label class="text-sm text-gray-400">Network:</label>
+                    <div class="grid grid-cols-1 gap-3">
+                        <label class="network-option selected">
+                            <input type="radio" name="withdrawal-network" value="TRC20" checked>
+                            <div class="flex items-center justify-between">
+                                <span class="font-semibold text-white">TRC20</span>
+                                <span class="text-xs text-gray-400">TRON</span>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">Fee: 0.1 BOSSX</div>
+                        </label>
+                    </div>
+                `;
+                document.getElementById('withdrawal-min').textContent = '• Minimal withdrawal: 1 BOSSX';
+                document.getElementById('withdrawal-fee').textContent = '• Fee withdrawal: 0.1 BOSSX';
+            }
+
+            // Update tab appearance
+            const usdtTab = document.getElementById('withdrawal-usdt-tab');
+            const bossxTab = document.getElementById('withdrawal-bossx-tab');
+
+            if (activeWithdrawalTab === 'USDT') {
+                usdtTab.className = 'tab-button active relative px-8 py-3 rounded-xl font-semibold transition-all duration-300 bg-gradient-to-r from-red-500 to-red-600 text-white';
+                bossxTab.className = 'tab-button relative px-8 py-3 rounded-xl font-semibold transition-all duration-300 bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white';
+            } else {
+                bossxTab.className = 'tab-button active relative px-8 py-3 rounded-xl font-semibold transition-all duration-300 bg-gradient-to-r from-red-500 to-red-600 text-white';
+                usdtTab.className = 'tab-button relative px-8 py-3 rounded-xl font-semibold transition-all duration-300 bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white';
+            }
+
+            // Update network selection event listeners
+            setupNetworkSelection();
+            
+            // Update withdrawal summary
+            updateWithdrawalSummary();
+            
+            // Update withdrawal history
+            updateWithdrawalHistory();
+            updateWithdrawalStatistics();
+        }
+
+        function setupNetworkSelection() {
+            document.querySelectorAll('.network-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    document.querySelectorAll('.network-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                    
+                    // Check the radio button
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    
+                    // Update summary
+                    updateWithdrawalSummary();
+                });
+            });
+        }
+
+        function updateWithdrawalSummary() {
+            const amount = parseFloat(document.getElementById('withdrawal-amount').value) || 0;
+            const selectedNetwork = document.querySelector('input[name="withdrawal-network"]:checked')?.value || 'TRC20';
+            const config = withdrawalConfig[activeWithdrawalTab].networks[selectedNetwork];
+            
+            const fee = config.fee;
+            const received = Math.max(0, amount - fee);
+            
+            document.getElementById('summary-network').textContent = selectedNetwork;
+            document.getElementById('summary-amount').textContent = `${formatAmount(amount)} ${activeWithdrawalTab}`;
+            document.getElementById('summary-fee').textContent = `${formatAmount(fee)} ${activeWithdrawalTab}`;
+            document.getElementById('summary-received').textContent = `${formatAmount(received)} ${activeWithdrawalTab}`;
+        }
+
+        function setMaxWithdrawal() {
+            const balance = activeWithdrawalTab === 'USDT' ? usdtBalance : bossxBalance;
+            const selectedNetwork = document.querySelector('input[name="withdrawal-network"]:checked')?.value || 'TRC20';
+            const config = withdrawalConfig[activeWithdrawalTab].networks[selectedNetwork];
+            const fee = config.fee;
+            
+            // Set max amount (balance minus fee, but not less than 0)
+            const maxAmount = Math.max(0, balance - fee);
+            document.getElementById('withdrawal-amount').value = maxAmount.toFixed(activeWithdrawalTab === 'USDT' ? 2 : 8);
+            
+            updateWithdrawalSummary();
+        }
+
+        function submitWithdrawal() {
+            const address = document.getElementById('withdrawal-address').value.trim();
+            const amount = parseFloat(document.getElementById('withdrawal-amount').value) || 0;
+            const selectedNetwork = document.querySelector('input[name="withdrawal-network"]:checked')?.value || 'TRC20';
+            const config = withdrawalConfig[activeWithdrawalTab].networks[selectedNetwork];
+            
+            const balance = activeWithdrawalTab === 'USDT' ? usdtBalance : bossxBalance;
+            const fee = config.fee;
+            const minAmount = config.min;
+            
+            // Validations
+            if (!address) {
+                showErrorMessage('Alamat wallet tujuan tidak boleh kosong!');
+                return;
+            }
+            
+            if (address.length < 30) {
+                showErrorMessage('Alamat wallet tidak valid!');
+                return;
+            }
+            
+            if (amount < minAmount) {
+                showErrorMessage(`Minimal withdrawal adalah ${minAmount} ${activeWithdrawalTab}!`);
+                return;
+            }
+            
+            if (amount > balance) {
+                showErrorMessage('Saldo tidak mencukupi!');
+                return;
+            }
+            
+            if ((amount + fee) > balance) {
+                showErrorMessage(`Saldo tidak cukup untuk membayar fee ${fee} ${activeWithdrawalTab}!`);
+                return;
+            }
+            
+            // Process withdrawal
+            const received = amount - fee;
+            
+            // Deduct balance
+            if (activeWithdrawalTab === 'USDT') {
+                usdtBalance -= amount;
+            } else {
+                bossxBalance -= amount;
+            }
+            
+            // Add to withdrawal history
+            const newWithdrawal = {
+                id: Date.now().toString(),
+                amount: amount,
+                fee: fee,
+                received: received,
+                address: address,
+                network: selectedNetwork,
+                status: 'processing',
+                timestamp: new Date(),
+                txHash: generateFakeTxHash()
+            };
+            
+            if (!withdrawalHistory[activeWithdrawalTab]) {
+                withdrawalHistory[activeWithdrawalTab] = [];
+            }
+            withdrawalHistory[activeWithdrawalTab].unshift(newWithdrawal);
+            
+            // Reset form
+            document.getElementById('withdrawal-address').value = '';
+            document.getElementById('withdrawal-amount').value = '';
+            
+            // Update UI
+            updateBalanceDisplays();
+            updateWithdrawalContent();
+            
+            showSuccessMessage(`Withdrawal ${amount} ${activeWithdrawalTab} berhasil disubmit! Proses akan memakan waktu 1-24 jam.`);
+        }
+
+        function generateFakeTxHash() {
+            const chars = '0123456789abcdef';
+            let result = '';
+            for (let i = 0; i < 64; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function updateWithdrawalHistory() {
+            const history = withdrawalHistory[activeWithdrawalTab] || [];
+            const historyContent = document.getElementById('withdrawal-history-content');
+
+            if (history.length === 0) {
+                historyContent.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="calendar" class="text-gray-400 w-6 h-6"></i>
+                        </div>
+                        <h4 class="text-gray-400 text-lg font-semibold mb-2">Belum ada history withdrawal</h4>
+                        <p class="text-gray-500">History withdrawal ${activeWithdrawalTab} Anda akan muncul di sini</p>
+                    </div>
+                `;
+            } else {
+                let tableHTML = `
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-gray-700">
+                                    <th class="text-left p-3 text-gray-400 font-semibold">Tanggal</th>
+                                    <th class="text-left p-3 text-gray-400 font-semibold">Jumlah</th>
+                                    <th class="text-left p-3 text-gray-400 font-semibold">Network</th>
+                                    <th class="text-left p-3 text-gray-400 font-semibold">Alamat</th>
+                                    <th class="text-left p-3 text-gray-400 font-semibold">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+
+                history.forEach(withdrawal => {
+                    const statusIcon = getWithdrawalStatusIcon(withdrawal.status);
+                    const statusColor = getWithdrawalStatusColor(withdrawal.status);
+                    const statusText = getWithdrawalStatusText(withdrawal.status);
+                    
+                    tableHTML += `
+                        <tr class="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
+                            <td class="p-3">
+                                <div class="flex items-center text-white">
+                                    <i data-lucide="clock" class="mr-2 text-gray-400 w-4 h-4"></i>
+                                    ${formatDate(withdrawal.timestamp)}
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="font-semibold text-red-400">
+                                    ${formatAmount(withdrawal.amount)} ${activeWithdrawalTab}
+                                </div>
+                                <div class="text-xs text-gray-400">
+                                    Fee: ${formatAmount(withdrawal.fee)} ${activeWithdrawalTab}
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="text-white font-mono text-sm">
+                                    ${withdrawal.network}
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="font-mono text-sm text-gray-300 max-w-32 truncate">
+                                    ${withdrawal.address}
+                                </div>
+                            </td>
+                            <td class="p-3">
+                                <div class="flex items-center ${statusColor}">
+                                    ${statusIcon}
+                                    <span class="ml-2 capitalize font-semibold">
+                                        ${statusText}
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                tableHTML += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                historyContent.innerHTML = tableHTML;
+            }
+
+            // Re-initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        function updateWithdrawalStatistics() {
+            const history = withdrawalHistory[activeWithdrawalTab] || [];
+            const completedWithdrawals = history.filter(w => w.status === 'completed');
+            const processingWithdrawals = history.filter(w => w.status === 'processing');
+            const totalAmount = completedWithdrawals.reduce((sum, w) => sum + w.amount, 0);
+
+            document.getElementById('total-withdrawals').textContent = completedWithdrawals.length;
+            document.getElementById('total-withdrawal-amount').textContent = formatAmount(totalAmount);
+            document.getElementById('processing-withdrawals').textContent = processingWithdrawals.length;
+        }
+
+        function getStatusIcon(status) {
+            switch (status) {
+                case 'confirmed':
+                    return '<i data-lucide="check-circle" class="text-green-400 w-4 h-4"></i>';
+                case 'failed':
+                    return '<i data-lucide="x-circle" class="text-red-400 w-4 h-4"></i>';
+                default:
+                    return '<i data-lucide="loader" class="text-yellow-400 w-4 h-4 animate-spin"></i>';
+            }
+        }
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 'confirmed':
+                    return 'text-green-400';
+                case 'failed':
+                    return 'text-red-400';
+                default:
+                    return 'text-yellow-400';
+            }
+        }
+
+        function getStatusText(status) {
+            switch (status) {
+                case 'confirmed':
+                    return 'Terkonfirmasi';
+                case 'failed':
+                    return 'Gagal';
+                default:
+                    return 'Pending';
+            }
+        }
+
+        function getWithdrawalStatusIcon(status) {
+            switch (status) {
+                case 'completed':
+                    return '<i data-lucide="check-circle" class="text-green-400 w-4 h-4"></i>';
+                case 'failed':
+                    return '<i data-lucide="x-circle" class="text-red-400 w-4 h-4"></i>';
+                default:
+                    return '<i data-lucide="loader" class="text-yellow-400 w-4 h-4 animate-spin"></i>';
+            }
+        }
+
+        function getWithdrawalStatusColor(status) {
+            switch (status) {
+                case 'completed':
+                    return 'text-green-400';
+                case 'failed':
+                    return 'text-red-400';
+                default:
+                    return 'text-yellow-400';
+            }
+        }
+
+        function getWithdrawalStatusText(status) {
+            switch (status) {
+                case 'completed':
+                    return 'Selesai';
+                case 'failed':
+                    return 'Gagal';
+                default:
+                    return 'Diproses';
+            }
+        }
+
+        function formatDate(date) {
+            return date.toLocaleString('id-ID', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatAmount(amount) {
+            return new Intl.NumberFormat('id-ID', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 8
+            }).format(amount);
+        }
+
+        function copyToClipboard(text) {
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showSuccessMessage('Alamat berhasil disalin ke clipboard!');
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showSuccessMessage('Alamat berhasil disalin ke clipboard!');
+            } catch (err) {
+                showSuccessMessage('Gagal menyalin alamat. Silakan copy manual.');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function downloadQRCode() {
+            const link = document.createElement('a');
+            link.download = `${activeTab}_QRCode.png`;
+            link.href = walletAddresses[activeTab].qrCode;
+            link.click();
+            showSuccessMessage(`QR Code ${activeTab} berhasil didownload!`);
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar toggle functionality
+            document.getElementById('toggle-sidebar').addEventListener('click', function() {
+                const sidebar = document.getElementById('sidebar');
+                const logoText = document.getElementById('logo-text');
+                const sidebarFooter = document.getElementById('sidebar-footer');
+                const menuTexts = document.querySelectorAll('.menu-text');
+                const toggleIcon = this.querySelector('[data-lucide]');
+                
+                if (sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.remove('collapsed');
+                    logoText.style.display = 'block';
+                    sidebarFooter.style.display = 'block';
+                    menuTexts.forEach(text => text.style.display = 'inline');
+                    toggleIcon.setAttribute('data-lucide', 'chevron-left');
+                } else {
+                    sidebar.classList.add('collapsed');
+                    logoText.style.display = 'none';
+                    sidebarFooter.style.display = 'none';
+                    menuTexts.forEach(text => text.style.display = 'none');
+                    toggleIcon.setAttribute('data-lucide', 'chevron-right');
+                }
+                
+                lucide.createIcons();
+            });
+
+            // Menu navigation
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const page = this.getAttribute('data-page');
+                    if (page) {
+                        showPage(page);
+                    }
+                });
+            });
+
+            // Deposit tab switching
+            document.getElementById('usdt-tab').addEventListener('click', function() {
+                activeTab = 'USDT';
+                updateDepositContent();
+            });
+
+            document.getElementById('bossx-tab').addEventListener('click', function() {
+                activeTab = 'BOSSX';
+                updateDepositContent();
+            });
+
+            // Withdrawal tab switching
+            document.getElementById('withdrawal-usdt-tab').addEventListener('click', function() {
+                activeWithdrawalTab = 'USDT';
+                updateWithdrawalContent();
+            });
+
+            document.getElementById('withdrawal-bossx-tab').addEventListener('click', function() {
+                activeWithdrawalTab = 'BOSSX';
+                updateWithdrawalContent();
+            });
+
+            // Deposit functionality
+            document.getElementById('copy-address').addEventListener('click', function() {
+                const address = walletAddresses[activeTab].address;
+                copyToClipboard(address);
+            });
+
+            document.getElementById('download-qr').addEventListener('click', function() {
+                downloadQRCode();
+            });
+
+            document.getElementById('refresh-history').addEventListener('click', function() {
+                showSuccessMessage('History deposit berhasil diperbarui!');
+                updateDepositHistory();
+            });
+
+            // Withdrawal functionality - using event delegation for dynamically created elements
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'max-withdrawal') {
+                    setMaxWithdrawal();
+                }
+                
+                if (e.target && e.target.id === 'refresh-withdrawal-history') {
+                    showSuccessMessage('History withdrawal berhasil diperbarui!');
+                    updateWithdrawalHistory();
+                }
+            });
+
+            document.addEventListener('input', function(e) {
+                if (e.target && e.target.id === 'withdrawal-amount') {
+                    updateWithdrawalSummary();
+                }
+            });
+        });
+
+        // Initialize everything when page loads
+        window.addEventListener('load', function() {
+            // Update clock every second
+            setInterval(updateClock, 1000);
+            updateClock();
+            
+            // Check for 6 AM stop every second (for dashboard)
+            setInterval(checkSixAMStop, 1000);
+            
+            // Initialize balance displays
+            updateBalanceDisplays();
+            
+            // Initialize deposit content
+            updateDepositContent();
+            
+            // Initialize withdrawal content
+            updateWithdrawalContent();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Welcome message
+            setTimeout(() => {
+                showSuccessMessage('Selamat datang di BossX Crypto Exchange Platform!');
+            }, 1000);
+        });
+
+        console.log('BossX Crypto Exchange Platform - Lengkap dengan Withdrawal berhasil dimuat!');
+    </script>
 </body>
 </html>

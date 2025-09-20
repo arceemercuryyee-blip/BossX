@@ -606,102 +606,6 @@
             color: #3b82f6;
             text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
         }
-
-        /* ============= CHAT ROOM STYLES ============= */
-        .chat-message {
-            animation: fadeInUp 0.3s ease-out;
-            border-left: 3px solid #f59e0b;
-            padding-left: 12px;
-            margin-bottom: 16px;
-            position: relative;
-            overflow: hidden;
-        }
-        .chat-message::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -3px;
-            width: 3px;
-            height: 100%;
-            background: linear-gradient(to bottom, #f59e0b, #10b981);
-            animation: glowPulse 2s ease-in-out infinite;
-        }
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        @keyframes glowPulse {
-            0%, 100% {
-                box-shadow: 0 0 8px #f59e0b;
-            }
-            50% {
-                box-shadow: 0 0 16px #10b981;
-            }
-        }
-        .chat-bubble {
-            background: rgba(31, 41, 55, 0.7);
-            border: 1px solid #374151;
-            border-radius: 0.75rem;
-            padding: 1rem;
-            transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .chat-bubble:hover {
-            border-color: #f59e0b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-        }
-        .chat-bubble::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #f59e0b, #10b981, #3b82f6);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .chat-bubble:hover::after {
-            opacity: 1;
-        }
-        .chat-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 0.875rem;
-            color: #000;
-            flex-shrink: 0;
-        }
-        .chat-input-container {
-            position: relative;
-        }
-        .chat-input-container::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #f59e0b, #10b981, #f59e0b, transparent);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.3s ease;
-        }
-        .chat-input-container:focus-within::after {
-            transform: scaleX(1);
-        }
     </style>
 </head>
 <body>
@@ -743,11 +647,7 @@
                     <i data-lucide="users" class="w-4 h-4"></i>
                     <span class="ml-2 font-medium menu-text text-sm">Peer to Peer</span>
                 </a>
-                <!-- ✅ MENU BARU: CHAT ROOM -->
-                <a href="#" class="menu-item flex items-center px-2 py-2 mb-2 rounded-xl text-gray-400" data-page="chatroom">
-                    <i data-lucide="message-circle" class="w-4 h-4"></i>
-                    <span class="ml-2 font-medium menu-text text-sm">Chat Room</span>
-                </a>
+                <!-- ✅ MENU CHAT ROOM SUDAH DIHAPUS -->
                 <!-- END MENU BARU -->
                 <a href="#" class="menu-item flex items-center px-2 py-2 mb-2 rounded-xl text-gray-400" data-page="faq">
                     <i data-lucide="help-circle" class="w-4 h-4"></i>
@@ -979,7 +879,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Deposit Page -->
                     <div id="deposit-page" class="page-content">
                         <!-- Header -->
@@ -1160,7 +1059,6 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Withdrawal Page -->
                     <div id="withdrawal-page" class="page-content">
                         <!-- Header -->
@@ -1395,110 +1293,8 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- ✅ HALAMAN BARU: CHAT ROOM -->
-                    <div id="chatroom-page" class="page-content">
-                        <div class="p-6">
-                            <!-- Header Chat Room -->
-                            <div class="bg-gradient-to-r from-blue-900 via-purple-900 to-indigo-900 border border-blue-500/30 rounded-xl p-6 mb-6">
-                                <div class="flex items-center justify-between">
-                                    <div>
-                                        <h1 class="text-3xl font-bold text-blue-400 mb-2">💬 BossX Community Chat</h1>
-                                        <p class="text-gray-300">Diskusikan strategi staking, tips harian, dan bangun komunitas bersama validator lainnya!</p>
-                                    </div>
-                                    <div class="crypto-icon-large">
-                                        <i data-lucide="message-circle" class="text-blue-400 w-8 h-8"></i>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Chat Container -->
-                            <div class="bg-gray-900 border border-blue-500/20 rounded-xl p-6">
-                                <!-- Messages Area -->
-                                <div id="chat-messages" class="h-96 overflow-y-auto mb-4 p-4 bg-black/20 rounded-lg space-y-4">
-                                    <!-- Contoh pesan sistem -->
-                                    <div class="chat-message">
-                                        <div class="flex items-start space-x-3">
-                                            <div class="chat-avatar bg-blue-500">
-                                                <i data-lucide="bot" class="w-4 h-4 text-white"></i>
-                                            </div>
-                                            <div class="flex-1">
-                                                <div class="text-xs text-gray-400 mb-1 flex items-center">
-                                                    <span class="font-bold text-blue-400">BossX Bot</span>
-                                                    <span class="mx-1">•</span>
-                                                    <span>Baru saja</span>
-                                                </div>
-                                                <div class="chat-bubble">
-                                                    <p class="text-white">Selamat datang di Chat Room BossX! 🎉 Gunakan fitur ini untuk berdiskusi seputar staking, reward, dan tips harian. Jangan lupa aktifkan Power ON setiap pagi! ⚡</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Contoh pesan user -->
-                                    <div class="chat-message">
-                                        <div class="flex items-start space-x-3">
-                                            <div class="chat-avatar bg-gradient-to-r from-amber-400 to-orange-500 text-black font-bold">
-                                                UA
-                                            </div>
-                                            <div class="flex-1">
-                                                <div class="text-xs text-gray-400 mb-1 flex items-center">
-                                                    <span class="font-bold text-amber-400">UserA</span>
-                                                    <span class="mx-1">•</span>
-                                                    <span>2 menit lalu</span>
-                                                </div>
-                                                <div class="chat-bubble">
-                                                    <p class="text-white">Saya baru saja dapat auto-claim 0.00023148 BossX! Lumayan buat nambah-nambah 💰</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="chat-message">
-                                        <div class="flex items-start space-x-3">
-                                            <div class="chat-avatar bg-gradient-to-r from-green-400 to-emerald-500 text-black font-bold">
-                                                UB
-                                            </div>
-                                            <div class="flex-1">
-                                                <div class="text-xs text-gray-400 mb-1 flex items-center">
-                                                    <span class="font-bold text-green-400">UserB</span>
-                                                    <span class="mx-1">•</span>
-                                                    <span>1 menit lalu</span>
-                                                </div>
-                                                <div class="chat-bubble">
-                                                    <p class="text-white">Tips: Aktifin Power ON jam 6:01 pagi biar dapet full 24 jam! ⏰</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Message Input -->
-                                <div class="chat-input-container">
-                                    <div class="flex space-x-3">
-                                        <input 
-                                            id="chat-input" 
-                                            type="text" 
-                                            placeholder="Tulis pesan Anda... (Enter untuk kirim)" 
-                                            class="flex-1 node-input"
-                                            onkeypress="if(event.key === 'Enter') sendMessage()"
-                                        />
-                                        <button 
-                                            onclick="sendMessage()" 
-                                            class="node-button bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-                                        >
-                                            <i data-lucide="send" class="w-4 h-4 mr-1"></i> Kirim
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="mt-3 text-xs text-gray-500">
-                                    <p>• Chat bersifat publik. Jangan bagikan informasi pribadi atau private key.</p>
-                                    <p>• Admin berhak menghapus pesan yang melanggar aturan.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- ✅ HALAMAN CHAT ROOM SUDAH DIHAPUS -->
                     <!-- END HALAMAN BARU -->
-
                     <!-- Other Pages -->
                     <div id="p2p-page" class="page-content">
                         <div class="p-6">
@@ -1525,12 +1321,10 @@
     <script>
         // Initialize Lucide icons
         lucide.createIcons();
-
         // Global variables
         let currentPage = 'dashboard';
         let activeTab = 'USDT';
         let activeWithdrawalTab = 'USDT';
-
         // Dashboard variables
         let isNodeActive = false;
         let isValidationRunning = false;
@@ -1543,7 +1337,6 @@
         let usdtBalance = 50; // Demo balance untuk withdrawal
         let bossxBalance = 100; // Starting balance for demo
         let stakedAmount = 0; // Jumlah BossX yang di-stake
-
         // Deposit & Withdrawal variables
         const walletAddresses = {
             USDT: {
@@ -1555,7 +1348,6 @@
                 qrCode: 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TTfKjrU18mi223ukVmz6FMNgBkma13kVA3'
             }
         };
-
         const withdrawalConfig = {
             USDT: {
                 networks: {
@@ -1569,7 +1361,6 @@
                 }
             }
         };
-
         const depositHistory = {
             USDT: [
                 {
@@ -1630,12 +1421,10 @@
                 }
             ]
         };
-
         const withdrawalHistory = {
             USDT: [],
             BOSSX: []
         };
-
         // Real-time clock
         function updateClock() {
             const now = new Date();
@@ -1654,7 +1443,6 @@
             document.getElementById('time').textContent = now.toLocaleTimeString('id-ID', timeOptions);
             document.getElementById('date').textContent = now.toLocaleDateString('id-ID', dateOptions);
         }
-
         // Show success message
         function showSuccessMessage(message) {
             const existingMessage = document.querySelector('.success-message');
@@ -1665,7 +1453,6 @@
             document.body.appendChild(messageDiv);
             setTimeout(() => messageDiv.remove(), 3000);
         }
-
         // Show error message
         function showErrorMessage(message) {
             const existingMessage = document.querySelector('.error-message');
@@ -1676,7 +1463,6 @@
             document.body.appendChild(messageDiv);
             setTimeout(() => messageDiv.remove(), 3000);
         }
-
         // Page navigation
         function showPage(pageId) {
             document.querySelectorAll('.page-content').forEach(page => page.classList.remove('active'));
@@ -1695,15 +1481,12 @@
             if (pageId === 'deposit') updateDepositContent();
             else if (pageId === 'withdrawal') updateWithdrawalContent();
         }
-
         // =============================
         // DASHBOARD FUNCTIONS (REVISED)
         // =============================
-
         function activateNode() {
             const inputValue = document.getElementById('activation-input').value;
             const inputAmount = parseFloat(inputValue) || 0;
-            
             if (inputAmount < 10) {
                 showErrorMessage('Minimal 10 BossX diperlukan untuk aktivasi node!');
                 return;
@@ -1712,12 +1495,10 @@
                 showErrorMessage('Saldo BossX tidak mencukupi!');
                 return;
             }
-            
             // Deduct BossX balance
             bossxBalance -= inputAmount;
             isNodeActive = true;
             stakedAmount = inputAmount; // Simpan jumlah stake
-            
             // Update UI
             const activationButton = document.getElementById('activation-button');
             const activationInput = document.getElementById('activation-input');
@@ -1727,60 +1508,45 @@
             activationInput.disabled = true;
             document.getElementById('node-status').textContent = 'Aktif';
             document.getElementById('node-status').style.color = '#10b981';
-            
             // Reset reward counters
             currentValidationReward = 0;
             totalRewardBalance = 0;
-            
             // Update tampilan
             updateBalanceDisplays();
             showSuccessMessage(`Node aktif! Stake: ${inputAmount} BossX. Silakan tekan Power ON untuk mulai validasi.`);
         }
-
         function startValidationRunning() {
             if (!isNodeActive) {
                 showErrorMessage('Aktivasi node terlebih dahulu!');
                 return;
             }
-            
             // Hitung reward per detik berdasarkan stake
             const rewardPerSecond = stakedAmount * 0.000000038580246913580247;
-            
             // Mulai akumulasi per detik
             validationInterval = setInterval(() => {
                 if (!isValidationRunning) return;
-                
                 currentValidationReward += rewardPerSecond;
                 document.getElementById('validation-balance').textContent = currentValidationReward.toFixed(9) + ' BossX';
-                
             }, 1000);
-            
             showSuccessMessage('Validasi dimulai! Reward mengalir per detik.');
         }
-
         function stopValidationRunning() {
             if (validationInterval) {
                 clearInterval(validationInterval);
                 validationInterval = null;
             }
         }
-
         function performAutoClaim() {
             if (!isValidationRunning || currentValidationReward <= 0) return;
-            
             // Pindahkan reward sementara ke reward permanen
             totalRewardBalance += currentValidationReward;
-            
             // Tampilkan notifikasi
             showSuccessMessage(`Auto Claim: +${currentValidationReward.toFixed(9)} BossX`);
-            
             // Reset akumulasi sementara
             currentValidationReward = 0;
-            
             // Update tampilan
             updateBalanceDisplays();
         }
-
         function convertToUSDT() {
             if (totalRewardBalance < 1) {
                 showErrorMessage('Minimal 1 BossX diperlukan untuk konversi ke USDT!');
@@ -1792,27 +1558,23 @@
             updateBalanceDisplays();
             showSuccessMessage(`Berhasil convert ${convertAmount} BossX ke ${convertAmount} USDT!`);
         }
-
         function updateBalanceDisplays() {
             document.getElementById('bossx-balance').textContent = bossxBalance.toFixed(9) + ' BossX';
             document.getElementById('validation-balance').textContent = currentValidationReward.toFixed(9) + ' BossX';
             document.getElementById('reward-balance').textContent = totalRewardBalance.toFixed(9) + ' BossX';
             document.getElementById('usdt-balance').textContent = usdtBalance.toFixed(2) + ' USDT';
         }
-
         function startAutoClaimCountdown() {
             if (autoClaimInterval) {
                 clearInterval(autoClaimInterval);
             }
             autoClaimSeconds = 60;
-            
             function updateAutoClaimTimer() {
                 if (!isValidationRunning) {
                     document.getElementById('auto-claim-timer').textContent = '--';
                     return;
                 }
                 document.getElementById('auto-claim-timer').textContent = autoClaimSeconds;
-                
                 if (autoClaimSeconds <= 0) {
                     performAutoClaim();
                     autoClaimSeconds = 60; // Reset timer
@@ -1820,11 +1582,9 @@
                     autoClaimSeconds--;
                 }
             }
-            
             autoClaimInterval = setInterval(updateAutoClaimTimer, 1000);
             updateAutoClaimTimer(); // Panggil segera agar timer langsung muncul
         }
-
         function stopAutoClaimCountdown() {
             if (autoClaimInterval) {
                 clearInterval(autoClaimInterval);
@@ -1832,20 +1592,16 @@
             }
             document.getElementById('auto-claim-timer').textContent = '--';
         }
-
         function togglePower() {
             if (!isNodeActive) {
                 showErrorMessage('Aktivasi node terlebih dahulu!');
                 return;
             }
-            
             const powerBtn = document.getElementById('power-btn');
             const statusText = document.getElementById('validation-status');
             const countdownDisplay = document.getElementById('countdown-display');
             const powerStatus = document.getElementById('power-status');
-            
             isValidationRunning = !isValidationRunning;
-            
             if (isValidationRunning) {
                 // Turn ON
                 powerBtn.classList.remove('off');
@@ -1854,11 +1610,9 @@
                 countdownDisplay.style.display = 'block';
                 powerStatus.style.display = 'block';
                 powerStatus.style.color = '#10b981';
-                
                 startCountdown();
                 startValidationRunning(); // Mulai akumulasi reward
                 startAutoClaimCountdown(); // Mulai hitung mundur auto-claim
-                
                 showSuccessMessage('Validasi dimulai! Auto-claim aktif setiap 60 detik.');
             } else {
                 // Turn OFF (manual, meski seharusnya tidak bisa)
@@ -1867,45 +1621,35 @@
                 statusText.textContent = 'Belum berjalan';
                 countdownDisplay.style.display = 'none';
                 powerStatus.style.display = 'none';
-                
                 if (countdownInterval) {
                     clearInterval(countdownInterval);
                 }
                 stopValidationRunning();
                 stopAutoClaimCountdown();
-                
                 showSuccessMessage('Validasi dihentikan manual.');
             }
-            
             lucide.createIcons();
         }
-
         function forceStopValidation() {
             if (!isValidationRunning) return;
-            
             isValidationRunning = false;
-            
             const powerBtn = document.getElementById('power-btn');
             const statusText = document.getElementById('validation-status');
             const countdownDisplay = document.getElementById('countdown-display');
             const powerStatus = document.getElementById('power-status');
-            
             powerBtn.classList.remove('on');
             powerBtn.classList.add('off');
             statusText.textContent = 'Belum berjalan';
             countdownDisplay.style.display = 'none';
             powerStatus.style.display = 'none';
-            
             if (countdownInterval) {
                 clearInterval(countdownInterval);
             }
             stopValidationRunning();
             stopAutoClaimCountdown();
-            
             showSuccessMessage('Validasi dihentikan otomatis pada jam 06:00. Silakan aktifkan kembali untuk melanjutkan.');
             lucide.createIcons();
         }
-
         function startCountdown() {
             function updateCountdown() {
                 const now = new Date();
@@ -1924,7 +1668,6 @@
             updateCountdown();
             countdownInterval = setInterval(updateCountdown, 1000);
         }
-
         function checkSixAMStop() {
             const now = new Date();
             if (now.getHours() === 6 && now.getMinutes() === 0 && now.getSeconds() === 0) {
@@ -1933,62 +1676,9 @@
                 }
             }
         }
-
-        // ✅ FUNGSI BARU: CHAT ROOM
-        function sendMessage() {
-            const input = document.getElementById('chat-input');
-            const message = input.value.trim();
-            if (!message) return;
-
-            const messagesContainer = document.getElementById('chat-messages');
-            const now = new Date();
-            const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-
-            // Generate random avatar color
-            const colors = [
-                'from-purple-400 to-pink-500',
-                'from-cyan-400 to-blue-500',
-                'from-green-400 to-emerald-500',
-                'from-yellow-400 to-orange-500',
-                'from-red-400 to-pink-500'
-            ];
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-
-            // Buat elemen pesan
-            const messageElement = document.createElement('div');
-            messageElement.className = 'chat-message';
-            messageElement.innerHTML = `
-                <div class="flex items-start space-x-3">
-                    <div class="chat-avatar bg-gradient-to-r ${randomColor} text-black font-bold">
-                        You
-                    </div>
-                    <div class="flex-1">
-                        <div class="text-xs text-gray-400 mb-1 flex items-center">
-                            <span class="font-bold text-blue-400">Anda</span>
-                            <span class="mx-1">•</span>
-                            <span>${timeString}</span>
-                        </div>
-                        <div class="chat-bubble">
-                            <p class="text-white">${message}</p>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            messagesContainer.appendChild(messageElement);
-            input.value = '';
-
-            // Scroll ke bawah
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-            // Notifikasi sukses
-            showSuccessMessage('Pesan terkirim!');
-        }
-
         // =============================
         // DEPOSIT & WITHDRAWAL FUNCTIONS
         // =============================
-
         function updateDepositContent() {
             const wallet = walletAddresses[activeTab];
             // Update QR code and labels
@@ -2014,7 +1704,6 @@
             updateDepositHistory();
             updateDepositStatistics();
         }
-
         function updateDepositHistory() {
             const history = depositHistory[activeTab] || [];
             const historyContent = document.getElementById('history-content');
@@ -2091,7 +1780,6 @@
             // Re-initialize Lucide icons
             lucide.createIcons();
         }
-
         function updateDepositStatistics() {
             const history = depositHistory[activeTab] || [];
             const confirmedDeposits = history.filter(d => d.status === 'confirmed');
@@ -2101,7 +1789,6 @@
             document.getElementById('total-amount').textContent = formatAmount(totalAmount);
             document.getElementById('pending-deposits').textContent = pendingDeposits.length;
         }
-
         function updateWithdrawalContent() {
             // Update balance display
             const balance = activeWithdrawalTab === 'USDT' ? usdtBalance : bossxBalance;
@@ -2173,7 +1860,6 @@
             updateWithdrawalHistory();
             updateWithdrawalStatistics();
         }
-
         function setupNetworkSelection() {
             document.querySelectorAll('.network-option').forEach(option => {
                 option.addEventListener('click', function() {
@@ -2191,7 +1877,6 @@
                 });
             });
         }
-
         function updateWithdrawalSummary() {
             const amount = parseFloat(document.getElementById('withdrawal-amount').value) || 0;
             const selectedNetwork = document.querySelector('input[name="withdrawal-network"]:checked')?.value || 'TRC20';
@@ -2203,7 +1888,6 @@
             document.getElementById('summary-fee').textContent = `${formatAmount(fee)} ${activeWithdrawalTab}`;
             document.getElementById('summary-received').textContent = `${formatAmount(received)} ${activeWithdrawalTab}`;
         }
-
         function setMaxWithdrawal() {
             const balance = activeWithdrawalTab === 'USDT' ? usdtBalance : bossxBalance;
             const selectedNetwork = document.querySelector('input[name="withdrawal-network"]:checked')?.value || 'TRC20';
@@ -2214,7 +1898,6 @@
             document.getElementById('withdrawal-amount').value = maxAmount.toFixed(activeWithdrawalTab === 'USDT' ? 2 : 8);
             updateWithdrawalSummary();
         }
-
         function submitWithdrawal() {
             const address = document.getElementById('withdrawal-address').value.trim();
             const amount = parseFloat(document.getElementById('withdrawal-amount').value) || 0;
@@ -2276,7 +1959,6 @@
             updateWithdrawalContent();
             showSuccessMessage(`Withdrawal ${amount} ${activeWithdrawalTab} berhasil disubmit! Proses akan memakan waktu 1-24 jam.`);
         }
-
         function generateFakeTxHash() {
             const chars = '0123456789abcdef';
             let result = '';
@@ -2285,7 +1967,6 @@
             }
             return result;
         }
-
         function updateWithdrawalHistory() {
             const history = withdrawalHistory[activeWithdrawalTab] || [];
             const historyContent = document.getElementById('withdrawal-history-content');
@@ -2365,7 +2046,6 @@
             // Re-initialize Lucide icons
             lucide.createIcons();
         }
-
         function updateWithdrawalStatistics() {
             const history = withdrawalHistory[activeWithdrawalTab] || [];
             const completedWithdrawals = history.filter(w => w.status === 'completed');
@@ -2375,7 +2055,6 @@
             document.getElementById('total-withdrawal-amount').textContent = formatAmount(totalAmount);
             document.getElementById('processing-withdrawals').textContent = processingWithdrawals.length;
         }
-
         function getStatusIcon(status) {
             switch (status) {
                 case 'confirmed':
@@ -2386,7 +2065,6 @@
                     return '<i data-lucide="loader" class="text-yellow-400 w-4 h-4 animate-spin"></i>';
             }
         }
-
         function getStatusColor(status) {
             switch (status) {
                 case 'confirmed':
@@ -2397,7 +2075,6 @@
                     return 'text-yellow-400';
             }
         }
-
         function getStatusText(status) {
             switch (status) {
                 case 'confirmed':
@@ -2408,7 +2085,6 @@
                     return 'Pending';
             }
         }
-
         function getWithdrawalStatusIcon(status) {
             switch (status) {
                 case 'completed':
@@ -2419,7 +2095,6 @@
                     return '<i data-lucide="loader" class="text-yellow-400 w-4 h-4 animate-spin"></i>';
             }
         }
-
         function getWithdrawalStatusColor(status) {
             switch (status) {
                 case 'completed':
@@ -2430,7 +2105,6 @@
                     return 'text-yellow-400';
             }
         }
-
         function getWithdrawalStatusText(status) {
             switch (status) {
                 case 'completed':
@@ -2441,7 +2115,6 @@
                     return 'Diproses';
             }
         }
-
         function formatDate(date) {
             return date.toLocaleString('id-ID', {
                 year: 'numeric',
@@ -2451,14 +2124,12 @@
                 minute: '2-digit'
             });
         }
-
         function formatAmount(amount) {
             return new Intl.NumberFormat('id-ID', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 8
             }).format(amount);
         }
-
         function copyToClipboard(text) {
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(text).then(() => {
@@ -2470,7 +2141,6 @@
                 fallbackCopy(text);
             }
         }
-
         function fallbackCopy(text) {
             const textArea = document.createElement('textarea');
             textArea.value = text;
@@ -2484,7 +2154,6 @@
             }
             document.body.removeChild(textArea);
         }
-
         function downloadQRCode() {
             const link = document.createElement('a');
             link.download = `${activeTab}_QRCode.png`;
@@ -2492,7 +2161,6 @@
             link.click();
             showSuccessMessage(`QR Code ${activeTab} berhasil didownload!`);
         }
-
         // Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
             // Sidebar toggle
@@ -2517,7 +2185,6 @@
                 }
                 lucide.createIcons();
             });
-
             // Menu navigation
             document.querySelectorAll('.menu-item').forEach(item => {
                 item.addEventListener('click', function(e) {
@@ -2526,7 +2193,6 @@
                     if (page) showPage(page);
                 });
             });
-
             // Deposit tabs
             document.getElementById('usdt-tab').addEventListener('click', function() {
                 activeTab = 'USDT';
@@ -2536,7 +2202,6 @@
                 activeTab = 'BOSSX';
                 updateDepositContent();
             });
-
             // Withdrawal tabs
             document.getElementById('withdrawal-usdt-tab').addEventListener('click', function() {
                 activeWithdrawalTab = 'USDT';
@@ -2546,7 +2211,6 @@
                 activeWithdrawalTab = 'BOSSX';
                 updateWithdrawalContent();
             });
-
             // Deposit functionality
             document.getElementById('copy-address').addEventListener('click', function() {
                 const address = walletAddresses[activeTab].address;
@@ -2559,7 +2223,6 @@
                 showSuccessMessage('History deposit berhasil diperbarui!');
                 updateDepositHistory();
             });
-
             // Withdrawal functionality
             document.addEventListener('click', function(e) {
                 if (e.target && e.target.id === 'max-withdrawal') {
@@ -2576,7 +2239,6 @@
                 }
             });
         });
-
         // Initialize
         window.addEventListener('load', function() {
             setInterval(updateClock, 1000);
@@ -2590,8 +2252,7 @@
                 showSuccessMessage('Selamat datang di BossX Crypto Exchange Platform!');
             }, 1000);
         });
-
-        console.log('BossX Crypto Exchange Platform - Sistem Reward Per Detik + Chat Room berhasil dimuat!');
+        console.log('BossX Crypto Exchange Platform - Sistem Reward Per Detik berhasil dimuat!');
     </script>
 </body>
 </html>

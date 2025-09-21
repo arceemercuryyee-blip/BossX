@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>BossX Masternode Console — Color Terminal</title>
+    <title>BossX Masternode Console — Mining Pool Style</title>
     <style>
         body {
             background: #000;
@@ -12,7 +12,7 @@
             color: #0f0;
         }
         .container {
-            max-width: 950px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         h2 {
@@ -45,45 +45,44 @@
         }
         #log-container {
             width: 100%;
-            height: 500px;
+            height: 550px;
             background: #000;
             border: 1px solid #00AAFF;
             padding: 15px;
             overflow-y: auto;
             white-space: pre-wrap;
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 13px;
+            line-height: 1.4;
             border-radius: 4px;
             box-shadow: 0 0 10px rgba(0, 255, 170, 0.1);
         }
         .log-entry {
             opacity: 0;
-            animation: fadeIn 0.4s forwards;
-            margin: 3px 0;
-            padding: 2px 0;
+            animation: fadeIn 0.3s forwards;
+            margin: 1px 0;
         }
         @keyframes fadeIn {
             to { opacity: 1; }
         }
 
-        /* Custom Colors */
-        .system   { color: #00AAFF; }    /* Cyan */
-        .info     { color: #00FFAA; }    /* Aqua Green */
-        .success  { color: #00FF00; }    /* Bright Green */
-        .reward   { color: #FFFF00; }    /* Yellow */
-        .warn     { color: #FFAA00; }    /* Orange */
+        /* Warna Log — Sesuai Level */
+        .info     { color: #00FFAA; }    /* Aqua */
+        .success  { color: #00FF00; }    /* Green */
+        .warning  { color: #FFAA00; }    /* Orange */
         .error    { color: #FF3333; }    /* Red */
-        .debug    { color: #888888; }    /* Gray */
-        .highlight{ color: #FFFFFF; font-weight: bold; } /* White Bold */
+        .alert    { color: #FF55FF; }    /* Pink */
+        .status   { color: #00AAFF; }    /* Cyan */
+        .highlight{ color: #FFFFFF; font-weight: bold; }
+        .maintenance { color: #FF55FF; background: #220022; padding: 1px 3px; border-radius: 2px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>🟢 BossX Masternode Terminal — Personal Activity Log</h2>
+        <h2>🟢 BossX Masternode Terminal — Mining Pool Style</h2>
 
         <div id="controls">
             <input type="number" id="stakeAmount" placeholder="Jumlah BOSSX yang di-stake" min="100" value="10000">
-            <button id="btnActivate">🔌 Aktivasi</button>
+            <button id="btnActivate">🔌 Aktivasi Node</button>
             <button id="btnPowerOn" disabled>🚀 Power On</button>
             <button id="btnPowerOff" disabled>🛑 Power Off</button>
         </div>
@@ -91,7 +90,7 @@
         <div id="log-container"></div>
 
         <p style="font-size: 12px; color: #555; margin-top: 10px;">
-            ⚠️ Simulasi interaktif — untuk tujuan demo & UX. Tidak terhubung ke blockchain.
+            ⚠️ Simulasi gaya mining pool. Log berjalan tiap detik setelah Power On, berhenti otomatis jam 06:00.
         </p>
     </div>
 
@@ -104,96 +103,142 @@
 
         let isActivated = false;
         let isPoweredOn = false;
-        let rewardInterval = null;
+        let logInterval = null;
         let totalEarned = 0;
         let stakeAmount = 0;
-        let userAddress = "0x" + Array(6).fill(0).map(() => Math.floor(Math.random()*16).toString(16)).join('').toUpperCase() + "..." + Array(4).fill(0).map(() => Math.floor(Math.random()*16).toString(16)).join('').toUpperCase();
-        let nodeID = "MN-" + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        let userAddress = "0x" + Array(8).fill(0).map(() => Math.floor(Math.random()*16).toString(16)).join('');
+        let shareCount = 2345000;
+        let gpuTemp0 = 68, gpuTemp1 = 65;
+        let gpuFan0 = 82, gpuFan1 = 79;
+        let hashrate0 = 48.3, hashrate1 = 45.1;
+        let startTime;
+
+        function getCurrentTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
 
         function log(message, className = '') {
-            const now = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const timestamp = getCurrentTime();
             const div = document.createElement('div');
             div.className = 'log-entry ' + className;
-            div.innerHTML = `[${now}] ${message}`;
+            div.innerHTML = `[${timestamp}] ${message}`;
             logContainer.appendChild(div);
             logContainer.scrollTop = logContainer.scrollHeight;
         }
 
-        function generateTxId() {
-            return "0x" + Array(8).fill(0).map(() => Math.floor(Math.random()*16).toString(16)).join('') + "..." + Array(6).fill(0).map(() => Math.floor(Math.random()*16).toString(16)).join('');
+        function getRandomFloat(min, max, decimals = 1) {
+            return (Math.random() * (max - min) + min).toFixed(decimals);
         }
 
         // 🎯 AKTIVASI
         btnActivate.addEventListener('click', () => {
             stakeAmount = parseFloat(stakeInput.value);
             if (!stakeAmount || stakeAmount < 100) {
-                log("❌ Minimal stake: 100 BOSSX.", "error");
+                log("[ERROR] Minimal stake: 100 BOSSX.", "error");
                 return;
             }
 
-            log(`🌐 [SYSTEM] Initializing masternode for user ${userAddress}...`, "system");
-            log(`📌 [INFO] Detected stake amount: <span class="highlight">${stakeAmount.toLocaleString()} BOSSX</span>`, "info");
-            setTimeout(() => log("🔍 [VALIDATION] Checking token allowance... APPROVED", "info"), 800);
-            setTimeout(() => log("🔐 [VALIDATION] Locking tokens in smart contract...", "info"), 1600);
+            log("[INFO] Starting BossX masternode operation...", "info");
             setTimeout(() => {
-                log(`✅ [SUCCESS] Locked <span class="highlight">${stakeAmount.toLocaleString()} BOSSX</span> successfully.`, "success");
-                log("⏳ [INFO] Awaiting POWER ON command...", "info");
+                log(`[STATUS] User aktivasi Node <span class="highlight">${stakeAmount.toLocaleString()} BOSSX</span> Status Aktiv`, "status");
                 isActivated = true;
                 btnActivate.disabled = true;
                 btnPowerOn.disabled = false;
-            }, 2400);
+            }, 1000);
         });
 
         // 🚀 POWER ON
         btnPowerOn.addEventListener('click', () => {
             if (!isActivated) return;
 
-            log("🚀 [SYSTEM] POWER ON initiated...", "system");
+            log("[INFO] Power On aktiv", "info");
+            startTime = new Date();
+
             setTimeout(() => {
-                const daily = stakeAmount * 0.1 / 30;
-                const hourly = daily / 24;
-                const perMin = hourly / 60;
-                log(`📊 [ENGINE] Reward rate calculated:`, "info");
-                log(`   → Daily: <span class="highlight">${daily.toFixed(4)} BOSSX</span>`, "info");
-                log(`   → Hourly: <span class="highlight">${hourly.toFixed(6)} BOSSX</span>`, "info");
-                log(`   → Per 60s: <span class="highlight">${perMin.toFixed(8)} BOSSX</span>`, "reward");
-                log(`🆔 [INFO] Assigned Node ID: <span class="highlight">${nodeID}</span>`, "info");
-                log("🟢 [SUCCESS] Masternode ONLINE. Reward distribution ACTIVE.", "success");
-                isPoweredOn = true;
-                btnPowerOn.disabled = true;
-                btnPowerOff.disabled = false;
+                log("[STATUS] Connected successfully to masternode Validasi Running", "status");
+                log("[INFO] Connecting to master pool BossXPool.com:4444...", "info");
+                setTimeout(() => {
+                    log("[INFO] Network sync: 100%", "info");
+                    log("[INFO] Connected to stratum+tcp://stratum.bossxpool.com:3333", "info");
 
-                // 💰 AUTO REWARD TIAP 60 DETIK
-                rewardInterval = setInterval(() => {
-                    const reward = perMin;
-                    totalEarned += reward;
-                    const txId = generateTxId();
-                    log(`💰 [REWARD] Claimed <span class="highlight">+${reward.toFixed(8)} BOSSX</span> (tx: ${txId.substring(0,12)}...${txId.slice(-4)})`, "reward");
-                    log(`📈 [INFO] Total earned: <span class="highlight">${totalEarned.toFixed(8)} BOSSX</span>`, "info");
+                    isPoweredOn = true;
+                    btnPowerOn.disabled = true;
+                    btnPowerOff.disabled = false;
 
-                    // Random system info
-                    if (Math.random() < 0.25) {
-                        const mem = (Math.random() * 100 + 200).toFixed(1);
-                        const cpu = Math.floor(Math.random() * 30) + 10;
-                        log(`📊 [DEBUG] System stats → MEM: ${mem}MB | CPU: ${cpu}%`, "debug");
-                    }
-                    if (Math.random() < 0.1) {
-                        log("📡 [INFO] Synced with blockchain layer. Block height: 18,450,203", "info");
-                    }
-                }, 60000);
+                    // 💡 LOG TIAP DETIK — GAYA MINING POOL
+                    logInterval = setInterval(() => {
+                        const now = new Date();
+                        const jam = now.getHours();
 
-            }, 2000);
+                        // 🔴 HENTIKAN OTOMATIS JAM 06:00:00
+                        if (jam === 6) {
+                            clearInterval(logInterval);
+                            log("[MAINTENANCE] Daily maintenance started. All operations paused.", "maintenance");
+                            isPoweredOn = false;
+                            btnPowerOff.disabled = true;
+                            btnPowerOn.disabled = false;
+                            return;
+                        }
+
+                        const detik = now.getSeconds();
+                        const menit = now.getMinutes();
+
+                        // SIMULASI GPU & HASIL
+                        gpuTemp0 = Math.max(65, Math.min(85, gpuTemp0 + (Math.random() > 0.7 ? (Math.random() > 0.5 ? 1 : -1) : 0)));
+                        gpuTemp1 = Math.max(60, Math.min(80, gpuTemp1 + (Math.random() > 0.7 ? (Math.random() > 0.5 ? 1 : -1) : 0)));
+                        gpuFan0 = Math.max(75, Math.min(95, gpuTemp0 * 1.2 - 10));
+                        gpuFan1 = Math.max(70, Math.min(90, gpuTemp1 * 1.1 - 5));
+                        hashrate0 = parseFloat(getRandomFloat(47.5, 48.5, 1));
+                        hashrate1 = parseFloat(getRandomFloat(44.5, 45.5, 1));
+
+                        const totalHash = (hashrate0 + hashrate1).toFixed(1);
+                        const rewardPerSecond = (stakeAmount * 0.1 / 30 / 24 / 3600); // 10% per bulan
+                        totalEarned += rewardPerSecond;
+
+                        const rand = Math.random();
+
+                        if (detik % 15 === 0) {
+                            log(`[STATUS] Uptime: ${String(Math.floor((now - startTime)/1000/60)).padStart(2,'0')}:${String(Math.floor((now - startTime)/1000)%60).padStart(2,'0')} | Shares/min: ${(Math.random()*0.5+1.5).toFixed(1)} | Next payout: 0.0166`, "status");
+                        } else if (detik % 10 === 0) {
+                            log(`[STATUS] Hash: ${totalHash} MH/s | Bal: ${totalEarned.toFixed(8)} BOSSX (~$${(totalEarned).toFixed(2)})`, "status");
+                        } else if (rand < 0.4) {
+                            shareCount++;
+                            log(`[SUCCESS] Accepted Share #${shareCount} (Diff: 12000) - Reward: ${rewardPerSecond.toFixed(8)} BOSSX`, "success");
+                        } else if (rand < 0.6) {
+                            log(`[INFO] GPU#0: ${hashrate0} MH/s | Temp: ${gpuTemp0}°C | Fan: ${Math.round(gpuFan0)}%`, "info");
+                        } else if (rand < 0.8) {
+                            log(`[INFO] GPU#1: ${hashrate1} MH/s | Temp: ${gpuTemp1}°C | Fan: ${Math.round(gpuFan1)}%`, "info");
+                        } else if (rand < 0.85) {
+                            log("[WARNING] High temp on GPU#0: 79°C | Fan: 90%", "warning");
+                        } else if (rand < 0.9) {
+                            log("[ALERT] Network latency spike (112ms). Monitoring...", "alert");
+                        } else if (rand < 0.95) {
+                            log("[ERROR] Invalid Validasi node #2345196 on GPU#1 - Nonce mismatch", "error");
+                        } else {
+                            log("[INFO] Job ID changed: 0a1b2c3d4e5f6789... (Pool: bossxpool)", "info");
+                        }
+
+                    }, 1000); // <-- TIAP 1 DETIK
+
+                }, 2000);
+            }, 1000);
         });
 
-        // 🛑 POWER OFF
+        // 🛑 POWER OFF (manual)
         btnPowerOff.addEventListener('click', () => {
             if (!isPoweredOn) return;
 
-            clearInterval(rewardInterval);
-            log("🛑 [SYSTEM] Shutting down reward engine...", "system");
+            clearInterval(logInterval);
+            log("[SYSTEM] User initiated shutdown...", "info");
             setTimeout(() => {
-                log(`✅ [SUCCESS] Masternode stopped. Total reward earned: <span class="highlight">${totalEarned.toFixed(8)} BOSSX</span>`, "success");
-                log("🔓 [INFO] Tokens will be unlocked after cooldown period (24h).", "info");
+                log(`[STATUS] Node stopped. Total reward: <span class="highlight">${totalEarned.toFixed(8)} BOSSX</span>`, "status");
                 isPoweredOn = false;
                 btnPowerOn.disabled = false;
                 btnPowerOff.disabled = true;
@@ -201,8 +246,8 @@
         });
 
         // LOG AWAL
-        log("⚡ [SYSTEM] BossX Masternode Terminal v2.3 — Ready for activation.", "system");
-        log("ℹ️  [INFO] Enter stake amount and click 'Aktivasi' to begin.", "info");
+        log("[SYSTEM] BossX Masternode Terminal v4.0 — Mining Pool Simulation", "info");
+        log("[INFO] Enter stake amount and click 'Aktivasi Node'.", "info");
     </script>
 </body>
 </html>
